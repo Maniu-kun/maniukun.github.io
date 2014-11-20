@@ -1,0 +1,582 @@
+<html>
+<head>
+	<title>Proyecto MI</title>
+	<meta charset="utf-8">
+	<style>
+	canvas{
+		
+		height: 100%;
+		width: 100vh;
+
+
+	}
+	img{
+		position:absolute;
+		z-index: 1;
+		margin-left: 30%;
+	}
+	/*  #stats {
+            position: absolute;
+            right: 10px;
+            top: 5px;
+            color: #fff;
+            text-align: left;
+            background: rgba(0, 0, 0, 0.5);
+            padding: 10px;
+            display: inline-block;
+            width: 60px;
+            height: 60px;
+            border: solid 1px black;
+            border-radius: 5px;
+        }
+*/
+	body{
+		text-align: left;
+		background-image: url("Forest.jpg");
+
+		
+	}
+
+	</style>
+</head>
+
+<body>
+	<script src="js/three.js"></script>
+	<script src="js/three.min.js"></script>
+	<script src="js/Detector.js"></script>
+	<script src="js/DDSLoader.js"></script>
+	<script src="js/MTLLoader.js"></script>
+	<script src="js/OBJMTLLoader.js"></script>
+	<script src="js/stats.min.js"></script>
+	<body bgcolor="#0A1B33">
+	<a href="http://www.facebook.com/OnceABC" target="_blank"><IMG src = "logo.png" with= "25%" height= "25%"></a>
+
+	<!-- <button type="button" onclick="carga();"> >> </button>
+	<button type="button" onclick="reset();"> O </button>
+	<button type="button" onclick="alert('Esto es un barril')">  </button> -->
+
+
+	<div id="stats"> </div>
+	<input type="hidden" value="0" id="theValue" />
+	<audio src="OUATS.mp3" controls autoplay loop>
+</audio>
+
+	<script>
+
+
+			var mouseX = 0;
+			var mouseY = 0;
+		//-----------------------Variables
+		var container;
+        var camara, escena, rndr,objts, objtmtl;
+        var texture, texture1, texture2, texture3,texture4,loader, mouseDown;
+        var mouseX = 0, mouseY = 0, objetos, raycaster;
+        var axes, mouseVector, projector, intersects, topl, bottoml, lomol,i, aumento=0;
+        var windowHalfX = window.innerWidth / 2;
+        var windowHalfY = window.innerHeight / 2;
+        var mouse = new THREE.Vector2(), INTERSECTED;
+		var statsNode = document.getElementById('stats');
+
+		// custom global variables
+		var video, videoImage, videoImageContext, videoTexture;
+		var clock= new THREE.Clock();
+
+		//-----------------------Escena
+
+		 init();
+
+
+
+		 function init() {
+
+
+
+                container = document.createElement( 'div' );
+                document.body.appendChild( container );
+                containerWidth = container.clientWidth;
+				containerHeight = container.clientHeight;
+
+                camara = new THREE.PerspectiveCamera(80, window.innerWidth / window.innerHeight, 1, 50 );
+                camara.position.z = 35;
+
+               	escena = new THREE.Scene();
+              	escena.fog = new THREE.FogExp2( 0x000000, 0.0007 );
+
+
+              	//-----------------------Luces
+
+				var ambient = new THREE.AmbientLight( 0x555555 );
+				escena.add( ambient );
+				var directionalLight = new THREE.DirectionalLight( 0x111111 );
+		        directionalLight.position.set( 0, 10, 10 ).normalize();
+		        escena.add( directionalLight );
+
+				var directionalLight = new THREE.DirectionalLight( 0xffeedd );
+						directionalLight.position.set( 1, 1, 1 ).normalize();
+						escena.add( directionalLight );
+
+                rndr= new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true, alpha: true });
+				rndr.setSize(window.innerWidth*0.99, window.innerHeight*0.95);
+                container.appendChild( rndr.domElement );
+
+                window.addEventListener( 'mousemove', onDocumentMouseMove, false );
+                window.addEventListener( 'mousedown', handleMouseDown, false );
+                document.addEventListener( 'touchstart', onDocumentTouchStart, false );
+                document.addEventListener( 'touchmove', onDocumentTouchMove, false );
+                window.addEventListener( 'resize', onWindowResize, false );
+
+                texture1 = new THREE.Texture();
+                texture2 = new THREE.Texture();
+                texture3 = new THREE.Texture();
+                texture4 = new THREE.Texture();
+                texture5 = new THREE.Texture();
+                texture6 = new THREE.Texture();
+                texture7 = new THREE.Texture();
+                texture8 = new THREE.Texture();
+                texture9 = new THREE.Texture();
+
+
+
+				var loaderT = new THREE.ImageLoader( manager );
+				loaderT.load( 'textures/barril.jpg', function ( image ) {
+
+					texture1.image = image;
+					texture1.needsUpdate = true;
+
+				} );
+
+				loaderT.load( 'textures/LibroBOTfinal.png', function ( image ) {
+
+					texture2.image = image;
+					texture2.needsUpdate = true;
+
+				} );
+
+
+				/*loaderT.load( 'textures/Lomo.png', function ( image ) {
+
+					texture3.image = image;
+					texture3.needsUpdate = true;
+
+				} );
+*/
+				loaderT.load( 'textures/LibroTOPfinal.png', function ( image ) {
+
+					texture4.image = image;
+					texture4.needsUpdate = true;
+
+				} );
+
+				loaderT.load( 'Forest.jpg', function ( image ) {
+
+					texture5.image = image;
+					texture5.needsUpdate = true;
+
+				} );
+
+
+				loaderT.load( 'textures/apple.jpg', function ( image ) {
+
+					texture6.image = image;
+					texture6.needsUpdate = true;
+
+				} );
+
+				loaderT.load( 'textures/rumpledg.jpg', function ( image ) {
+
+					texture7.image = image;
+					texture7.needsUpdate = true;
+
+				} );
+
+				loaderT.load( 'textures/sword.jpg', function ( image ) {
+
+					texture8.image = image;
+					texture8.needsUpdate = true;
+
+				} );
+
+
+				loaderT.load( 'textures/Bow.jpg', function ( image ) {
+
+					texture9.image = image;
+					texture9.needsUpdate = true;
+
+				} );
+
+				var manager = new THREE.LoadingManager();
+				manager.onProgress = function ( item, loaded, total ) {
+
+					console.log( item, loaded, total );
+
+				};
+
+				texture=[texture1,texture2, texture3, texture4, texture5, texture6, texture7, texture8, texture9];
+				objts = ['obj/barril.obj', 'obj/LibroBOTfinal.obj', 'obj/Lomo.obj', 'obj/LibroTOPfinal.obj', 'obj/forest.obj', 'obj/apple.obj', 'obj/rumpledg.obj', 'obj/Sword.obj', 'obj/Bow.obj'];
+				objtmtl=['obj/BARRIL.mtl', 'obj/LibroBOTfinal.mtl',  'obj/Lomo.mtl','obj/LibroTOPfinal.mtl','obj/forest.mtl', 'obj/apple.mtl', 'obj/rumpledg.mtl', 'obj/Sword.mtl', 'obj/Bow.mtl'];
+				loader = new THREE.OBJMTLLoader( manager );
+				top=new THREE.Object3D();
+				bottom=new THREE.Object3D();
+				//lomo=new THREE.Object3D();
+				libro();
+				projector = new THREE.Projector();
+				raycaster = new THREE.Raycaster();
+
+
+
+
+				///////////
+				// VIDEO //
+				///////////
+				
+				// create the video element
+				video = document.createElement( 'video' );
+				// video.id = 'video';
+				// video.type = ' video/ogg; codecs="theora, vorbis" ';
+				video.src = "OUAT.mp4";
+				video.load(); // must call after setting/changing source
+				//video.play();
+				
+				// alternative method -- 
+				// create DIV in HTML:
+				// <video id="myVideo" autoplay style="display:none">
+				//		<source src="videos/sintel.ogv" type='video/ogg; codecs="theora, vorbis"'>
+				// </video>
+				// and set JS variable:
+				// video = document.getElementById( 'myVideo' );
+				
+				videoImage = document.createElement( 'canvas' );
+				videoImage.width = 620;
+				videoImage.height = 358;
+
+				videoImageContext = videoImage.getContext( '2d' );
+				// background color if no video present
+				videoImageContext.fillStyle = '#000000';
+				videoImageContext.fillRect( 0, 0, videoImage.width, videoImage.height );
+
+				videoTexture = new THREE.Texture( videoImage );
+				videoTexture.minFilter = THREE.LinearFilter;
+				videoTexture.magFilter = THREE.LinearFilter;
+				
+				var movieMaterial = new THREE.MeshBasicMaterial( { map: videoTexture, overdraw: true, side:THREE.DoubleSide } );
+				// the geometry on which the movie will be displayed;
+				// 		movie image will be scaled to fit these dimensions.
+				var movieGeometry = new THREE.PlaneGeometry( 20, 10, 0, 0 );
+				var movieScreen = new THREE.Mesh( movieGeometry, movieMaterial );
+				movieScreen.position.set(0,0,10);
+				movieScreen.rotation.x =-.75;
+				escena.add(movieScreen);
+
+				//PARTICULAS
+
+
+			var particleTexture = THREE.ImageUtils.loadTexture( 'particle.png' );
+
+			particleGroup = new THREE.Object3D();
+			particleAttributes = { startSize: [], startPosition: [], randomness: [] };
+
+			
+			var totalParticles = 2500;
+			var radiusRange = 25;
+			for( var i = 0; i < totalParticles; i++ ) 
+				{
+				    var spriteMaterial = new THREE.SpriteMaterial( { map: particleTexture, useScreenCoordinates: false, color: 0xffffff } );
+					
+					var sprite = new THREE.Sprite( spriteMaterial );
+					sprite.scale.set( 1.0, 1.0, 1.0 ); 
+					sprite.position.set( Math.random() - 0.5, Math.random() - 0.5, Math.random() - 0.5 );
+					sprite.position.setLength( radiusRange * (Math.random() * 5.0 + 0.9) );
+					
+					sprite.material.color.setHSL( 0.0, 0.0, 0.0 );
+					
+					sprite.opacity = 0.50; 
+					sprite.material.blending = THREE.AdditiveBlending; 
+					
+					particleGroup.add( sprite );
+					particleAttributes.startPosition.push( sprite.position.clone() );
+					particleAttributes.randomness.push( Math.random() );
+				}
+			particleGroup.position.x = 0;
+			particleGroup.position.y = 0;
+			particleGroup.position.z = 10;
+			
+			escena.add( particleGroup );
+
+				//FIN PARTICULAS
+            }
+
+		//-----------------------Objs
+		
+				function libro(){
+				
+				//var objs;
+				loader.load( objts[0], objtmtl[0], 
+					function ( object ) {
+					object.position.x=0;
+					object.position.y=0;
+					object.position.z=0;
+					object.traverse( function ( child ) {if ( child instanceof THREE.Mesh ) {child.material.map = texture[0];}} );
+					//escena.add( object );
+					
+				} );
+
+				loader.load( objts[1], objtmtl[1], 
+					function ( object ) {
+					object.position.x=0;
+					object.position.y=0;
+					object.position.z=7;
+					object.rotation.x=0.8;
+					object.traverse( function ( child ) {if ( child instanceof THREE.Mesh ) {child.material.map = texture[1];}} );
+					topl=object;
+					escena.add(object);
+					
+					
+				} );
+
+
+				loader.load( objts[3], objtmtl[3], 
+					function ( object ) {
+					object.position.x=0;
+					object.position.y=0;
+					object.position.z=7;
+					object.rotation.x=0.8;
+					object.traverse( function ( child ) {if ( child instanceof THREE.Mesh ) {child.material.map = texture[3];}} );
+					bottoml=object;
+					escena.add(object);
+					
+				} );
+
+
+				//Manzana
+				loader.load( objts[5], objtmtl[5], 
+					function ( object ) {
+					object.position.x=-25;
+					object.position.y=0;
+					object.position.z=2;
+					object.rotation.x=0;
+					object.scale.x=0.1;
+					object.scale.y=0.1;
+					object.scale.z=0.1;
+					object.rotation.y=1.2;
+					object.traverse( function ( child ) {if ( child instanceof THREE.Mesh ) {child.material.map = texture[5];}} );
+					escena.add(object);
+				} );
+
+				//Daga
+				loader.load( objts[6], objtmtl[6], 
+					function ( object ) {
+					object.position.x=-18;
+					object.position.y=-2;
+					object.position.z=10;
+					object.scale.x=1.4;
+					object.scale.y=1.4;
+					object.scale.z=1.4;
+					object.rotation.x=-2.4;
+					object.rotation.y=0.8;
+					object.rotation.z=.2;
+					object.traverse( function ( child ) {if ( child instanceof THREE.Mesh ) {child.material.map = texture[6];}} );
+					escena.add(object);
+				} );
+
+
+				//Espada
+				loader.load( objts[7], objtmtl[7], 
+					function ( object ) {
+					object.position.x=32;
+					object.position.y=2;
+					object.position.z=0;
+					object.scale.x=2;
+					object.scale.y=2;
+					object.scale.z=2;
+					object.rotation.x=-2;
+					object.rotation.y=-0.8;
+					//object.rotation.z=.8;
+					object.traverse( function ( child ) {if ( child instanceof THREE.Mesh ) {child.material.map = texture[7];}} );
+					escena.add(object);
+				} );
+
+
+				//Arco
+				loader.load( objts[8], objtmtl[8], 
+					function ( object ) {
+					object.position.x=37;
+					object.position.y=-23;
+					object.position.z=0;
+					object.scale.x=18;
+					object.scale.y=18;
+					object.scale.z=18;
+					object.rotation.x=-.5;
+					object.rotation.y=.5;
+					object.rotation.z=.5;
+					object.traverse( function ( child ) {if ( child instanceof THREE.Mesh ) {child.material.map = texture[8];}} );
+					escena.add(object);
+				} );
+
+				 }
+																						
+				function reset(){camara.position.y=0;}
+
+		 		function onDocumentTouchMove( event ) {
+
+                if ( event.touches.length === 1 ) {
+
+                    event.preventDefault();
+
+                    mouseX = event.touches[ 0 ].pageX - windowHalfX;
+                    mouseY = event.touches[ 0 ].pageY - windowHalfY;
+
+                }
+
+            }
+
+		 
+        function handleMouseDown(event) {
+		    mouseDown = true;
+		   lastMouseX = event.clientX;
+		   lastMouseY = event.clientY;
+		  }
+
+		   function handleMouseUp(event) {
+		    mouseDown = false;
+		  }
+
+
+            function onDocumentMouseMove( event) {
+
+            	event.preventDefault();
+
+				mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
+				mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+
+            }
+
+          function onDocumentTouchStart( event ) {
+
+                if ( event.touches.length === 1 ) {
+
+                    event.preventDefault();
+
+                    mouseX = event.touches[ 0 ].pageX - windowHalfX;
+                    mouseY = event.touches[ 0 ].pageY - windowHalfY;
+
+                }
+
+            }
+
+            function onWindowResize() {
+                windowHalfX = window.innerWidth / 2;
+                windowHalfY = window.innerHeight / 2;
+
+                camara.aspect = window.innerWidth / window.innerHeight;
+                camara.updateProjectionMatrix();
+
+                rndr.setSize( window.innerWidth, window.innerHeight );
+
+            }
+
+            function ParticlesMov(){
+			var time = 0.1 * clock.getElapsedTime();
+			var color=0;
+			for ( var c = 0; c < particleGroup.children.length; c ++ ) 
+				{
+
+					var sprite = particleGroup.children[ c ];
+					var a = particleAttributes.randomness[c] + 1;
+					var pulseFactor = Math.sin(a * time) * 0.1 + 0.9;
+					sprite.position.x = particleAttributes.startPosition[c].x * pulseFactor;
+					sprite.position.y = particleAttributes.startPosition[c].y * pulseFactor;
+					sprite.position.z = particleAttributes.startPosition[c].z * pulseFactor;
+
+					sprite.material.color.setHSL(color , 0.9, 0.8 );
+					if(color<0.2)	{color+=0.001;}
+					else{color=0;}
+				}
+
+			// rotate the entire group
+			// particleGroup.rotation.x = time * 0.5;
+			particleGroup.rotation.x = time * 0.75;
+			// particleGroup.rotation.z = time * 1.0;
+		}
+
+
+
+            function animate() {
+
+                requestAnimationFrame( animate );
+                //requestAnimationFrame(Draw);
+                Draw();
+             
+
+            }
+
+		//--------------------------------------------------------------------------------------------------Draw
+		function Draw(){
+			statsNode.innerHTML = '';
+			camara.lookAt(escena.position);
+			//if(gocamara==1){camara.position.y+=0.5;}
+			ParticlesMov();
+			
+				if ( video.readyState === video.HAVE_ENOUGH_DATA ) 
+					{
+						videoImageContext.drawImage( video, 0, 0 );
+						if ( videoTexture ) 
+							videoTexture.needsUpdate = true;
+					}
+
+				var vector = new THREE.Vector3( mouse.x, mouse.y, 1 );
+				projector.unprojectVector( vector, camara );
+				vector.sub(camara.position);
+				vector.normalize();
+
+				raycaster.set( camara.position, vector );
+
+				intersects = raycaster.intersectObjects(escena.children, true);
+
+
+				if ( intersects.length > 0 ) {
+
+					if(intersects[0].object != INTERSECTED)
+        			{
+	        			if ( INTERSECTED ) 
+						INTERSECTED = intersects[ 0 ].object;
+						var target = intersects[0].object;
+                		//statsNode.innerHTML = 'ID: ' + target.id;
+						}
+				}
+
+
+				else 
+				{
+					if ( INTERSECTED ) 
+					INTERSECTED = null;
+				}
+
+				if(mouseDown){
+					if(v = 1){
+						for ( i = 0; i < 0.5; i ++ ) {
+							if(aumento<0.5){
+							bottoml.rotation.x-=0.045;
+							aumento+=0.01;
+                   			//lomol.rotation.x+=0.01;
+                   			camara.position.y+=0.20;
+                   			camara.position.z-=0.25
+                   			video.play();
+              				 }
+               			 }
+               			 v= 0;
+           			 }
+           		
+            }
+
+
+                camara.lookAt( escena.position );
+                rndr.render( escena, camara );
+		}
+
+
+		animate();
+
+	</script>
+
+</body>
+</html>
